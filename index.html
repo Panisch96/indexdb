@@ -1,0 +1,127 @@
+<!doctype html manifest="/mf/manifest.mf">
+<html ng-app>
+	<head>
+		<meta charset="UTF-8">
+ 		<title>Dart</title>
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+		<link rel="stylesheet" type="text/css" 
+		href="stylesheets/iPad.css" media="only screen and (max-width:1024px)">
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/angular.min.js"></script>
+		<script src="../js/IndexedDB-polyfill-master/indexedDB.polyfill.js"></script>
+		<script src="../js/db.js"></script>
+		<script src="../js/idb.js"></script>
+		
+		
+		
+		<script>
+		window.indexedDB = { polyfill : true };
+		//'use strict';
+		
+		var IsNew;
+		if(confirm("Wollen Sie das alte Spiel laden?"))
+		{
+			IsNew = false;
+		}
+		else
+		{
+			IsNew = true;
+			removeall();
+		}
+		
+		function DartCtrl($scope){
+				  function increment(number) {
+					
+				 var plname = this.name;
+				  if(this.status[number-14] == 3)
+					{
+						angular.forEach($scope.players, function(player, index) 
+						{
+							if(player.name != plname && player.status[number-14] < 3)
+							{
+								if(number == 14)
+								player.total += 25;
+								else
+								player.total += number;
+								
+								modify(player.status, player.total, player.nrplayer);
+							}
+						})
+					}
+					else
+					{
+						this.status[number-14] = this.status[number-14] ? (this.status[number-14] + 1) : 1;
+						modify(this.status, this.total, this.nrplayer);
+					}
+				  }
+				  
+				   
+				  $scope.players = [];
+					
+				var anzahl;
+				var plname;
+				var objSpieler = null;
+				var i;
+				if(IsNew)
+					anzahl = prompt("Anzahl Spieler angeben: ");
+				else
+				{
+					
+					objSpieler = readone(0);
+					anzahl = objSpieler.anzplayer;
+				}
+				for(i = 0; i < anzahl; i++)
+				{
+					if(IsNew)
+					{
+						plname = prompt("Name Spieler"+(i+1)+" eingeben: ");
+						$scope.players.push({nrplayer: i, name: plname, status: [0,0,0,0,0,0,0], total: 0, increment: increment, anzplayer: anzahl});
+						add($scope.players[i]);
+					}
+					else
+					{
+						objSpieler = readall();
+						$scope.players.push();
+					}
+				}}
+				</script>
+		<style>
+			.feld
+			{
+				display: block;
+				height: 100%;
+				width: 100%;
+				background-repeat:no-repeat;
+				color: #fff;ö
+				text-align:right;
+				background-size: contain;
+			}
+		</style>
+		
+	</head>
+	<body>	
+		<div id="Content"  ng-controller="DartCtrl">
+			<div id="Tabelle">
+				<table border="1">
+					<thead>
+						<tr>
+							<td>Name</td>
+							<td data-ng-repeat="number in [20,19,18,17,16,15,'Bull','Punkte']" data-ng-bind="number"></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="player in players">
+							<td data-ng-bind="player.name"></td>
+							<td data-ng-repeat="number in [20,19,18,17,16,15,'14']">
+								<a class="feld" data-ng-class="{'null':player.status[number-14] == 0, 'eins':player.status[number-14] == 1, 'zwei':player.status[number-14] == 2, 'drei':player.status[number-14] == 3}" data-ng-bind="player.status[number-14]" data-ng-click="player.increment(number)">click&nbsp;</a>
+							</td>
+							<td data-ng-bind="player.total"></td>
+						</tr>
+					</tbody>
+				</table>
+				<button onclick="readall()">lesen</button>
+				<button onclick="removeall()">Alles löschen</button>
+			</div>
+		</div>
+	</body>
+</html>
